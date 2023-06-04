@@ -1,0 +1,16 @@
+.board{
+    width: 1000px;
+    margin-top: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.grid-cell{
+    border: 1px solid black;
+    margin: 1px;
+    width: 15px;
+    height: 15px;
+    background-color: white;
+}

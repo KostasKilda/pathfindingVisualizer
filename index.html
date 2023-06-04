@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="style/styles.css">
+
+    <title>Pathfinding visualizer</title>
+
+</head>
+
+<body>
+    <div>
+        <div class="grid-amount">
+            Row amount <span class="rows"></span>
+        </div>
+        <input type="range" min="5" max="40" value="20" class="slider" id="row-amount">
+    </div>
+
+    <div>
+        <div class="grid-amount">
+            Column amount <span class="columns"></span>
+        </div>
+        <input type="range" min="5" max="40" value="20" class="slider" id="column-amount">
+    </div>
+
+    <div>
+        <div class="grid-amount">
+            Pathfinding speed <span class="Pathfinding speed"></span>
+        </div>
+        <input type="range" min="0.5" max="5" value="1" step="0.5" class="slider" id="pathfinding-speed">
+    </div>
+
+    <div>
+        <div class="grid-amount">
+            BackTracing speed <span class="Backtracing speed"></span>
+        </div>
+        <input type="range" min="0.5" max="5" value="1" step="0.5" class="slider" id="backtracing-speed">
+    </div>
+
+    <div>
+        <button onclick="updateGrid()">
+            Clear
+        </button>
+    </div>
+
+    <div>
+        <button onclick="removeWalls()">
+            Remove walls
+        </button>
+    </div>
+
+    <div>
+        <button onclick="dijkstrasPathfinding()">
+            Pathfind
+        </button>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: center;">
+        <div class="board">
+
+        </div>
+    </div>
+
+    <script src="script/main.js"></script>
+</body>
+
+</html>
