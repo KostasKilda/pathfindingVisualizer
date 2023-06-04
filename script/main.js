@@ -1,44 +1,39 @@
 let startEndFlags = 0
 const container = document.getElementsByClassName('board')[0];
 
-const rowAmount = document.getElementById('row-amount')
-rowAmount.addEventListener("change", updateGrid)
-
-const columnAmount = document.getElementById('column-amount')
-columnAmount.addEventListener("change", updateGrid)
+let rowAmount = 0
+let columnAmount = 0
 
 
-let pathfindingSpeed = document.getElementById('pathfinding-speed')
-pathfindingSpeed.addEventListener("change", changePathfindingSpeed)
-changePathfindingSpeed();
+let algorithmSpeed = document.getElementById('algorithm-speed')
+algorithmSpeed.addEventListener("change", changeAlgorithmSpeed)
+changeAlgorithmSpeed();
 
+window.addEventListener('resize', updateGrid);
 
-let backTracingSpeed = document.getElementById('backtracing-speed')
-backTracingSpeed.addEventListener("change", changeBacktracingSpeed)
-changeBacktracingSpeed();
-
-
-const grid = [];
-const startNode = []
-const endNode = []
+let grid = [];
+let startNode = []
+let endNode = []
 
 // Creating the grid system
 function updateGrid() {
+
+    // Adjusting the amount of rows and columns based on window size (90% width, 80% height)
+    rowAmount = parseInt(window.innerWidth/10*9/20)
+    columnAmount = parseInt(window.innerHeight/10*8/20);
 
     startEndFlags = 0
 
     // Clearing innerHTML
     container.innerHTML = '';
-    document.getElementsByClassName('rows')[0].innerHTML = rowAmount.value;
-    document.getElementsByClassName('columns')[0].innerHTML = columnAmount.value;
 
     // Adding the grid
-    for (let i = 0; i < rowAmount.value; i++) {
+    for (let i = 0; i < rowAmount; i++) {
 
         let row = document.createElement('div');
         row.className = 'grid-row';
 
-        for (let j = 0; j < columnAmount.value; j++) {
+        for (let j = 0; j < columnAmount; j++) {
 
             let cell = document.createElement('div');
             cell.className = `grid-cell grid-${i}-${j} not-found`;
@@ -51,9 +46,9 @@ function updateGrid() {
 
 
     // Creating a graph object using 2D array
-    for (let i = 0; i < rowAmount.value; i++) {
+    for (let i = 0; i < rowAmount; i++) {
         grid[i] = [];
-        for (let j = 0; j < columnAmount.value; j++) {
+        for (let j = 0; j < columnAmount; j++) {
             grid[i][j] = {
                 element: document.querySelector(`.grid-${i}-${j}`),
                 isStartNode: false,
@@ -65,6 +60,9 @@ function updateGrid() {
             };
         }
     }
+
+    startNode = []
+    endNode = []
 
     cellEventListener();
 }
@@ -137,7 +135,7 @@ function updateCell(cell, mouseDown) {
 
     if (cellgrid.split(' ')[0] == 'grid-cell') {
         if (startEndFlags == 0) {
-            cellElement.style.backgroundColor = 'Green';
+            cellElement.style.backgroundColor = '#4BA351';
             cellElement.classList.remove("not-found");
             cellElement.classList.add("startNode");
             grid[index[1]][index[2]].isStartNode = true;
@@ -157,7 +155,7 @@ function updateCell(cell, mouseDown) {
             startEndFlags += 1;
         }
         else if ((cellgrid.split(" ")[2] != "endNode") && (cellgrid.split(" ")[2] != "startNode")) {
-            cellElement.style.backgroundColor = 'Black';
+            cellElement.style.backgroundColor = 'Grey';
             cellElement.classList.remove("not-found");
             cellElement.classList.add("wall");
             grid[index[1]][index[2]].isWall = true;
@@ -182,14 +180,9 @@ function removeWalls() {
 
 
 // Event listener for pathfinding speed slider
-function changePathfindingSpeed(){
-    pathfindingSpeed = document.getElementById('pathfinding-speed')
-    document.getElementsByClassName('Pathfinding speed')[0].innerHTML = `${pathfindingSpeed.value}x`
-}
-
-function changeBacktracingSpeed(){
-    backTracingSpeed = document.getElementById('backtracing-speed')
-    document.getElementsByClassName('Backtracing speed')[0].innerHTML = `${backTracingSpeed.value}x`
+function changeAlgorithmSpeed(){
+    algorithmSpeed = document.getElementById('algorithm-speed')
+    document.getElementsByClassName('Algorithm speed')[0].innerHTML = `${algorithmSpeed.value}x`
 }
 
 
@@ -230,7 +223,7 @@ async function dijkstrasPathfinding() {
             neighborNodes.pop(i);
         }
 
-        await sleep(parseInt(500/pathfindingSpeed.value));
+        await sleep(parseInt(250/algorithmSpeed.value));
     }
 
     finalNode()
@@ -246,13 +239,13 @@ function getNeighbors(node, neighborNodes) {
         neighborNodes.push(grid[row][col - 1])
     }
 
-    if ((row + 1 < rowAmount.value) && !(grid[row + 1][col].isWall) && !(grid[row + 1][col].visited)) {
+    if ((row + 1 < rowAmount) && !(grid[row + 1][col].isWall) && !(grid[row + 1][col].visited)) {
         grid[row + 1][col].visited = true;
         grid[row + 1][col].pastNode = node;
         neighborNodes.push(grid[row + 1][col])
     }
 
-    if ((col + 1 < columnAmount.value) && !(grid[row][col + 1].isWall) && !(grid[row][col + 1].visited)) {
+    if ((col + 1 < columnAmount) && !(grid[row][col + 1].isWall) && !(grid[row][col + 1].visited)) {
         grid[row][col + 1].visited = true;
         grid[row][col + 1].pastNode = node;
         neighborNodes.push(grid[row][col + 1])
@@ -281,7 +274,21 @@ async function finalNode() {
 
         backTrackNode.element.style.backgroundColor = 'blue';
 
-        await sleep(parseInt(100/backTracingSpeed.value));
+        await sleep(parseInt(100/algorithmSpeed.value));
     }
 
+}
+
+
+function generateWalls(){
+    for (let i = 0; i < rowAmount; i++) {
+        for (let j = 0; j < columnAmount; j++) {
+            if((Math.random() >= 0.75) && !(grid[i][j].isEndNode) && !(grid[i][j].isStartNode)){
+                grid[i][j].isWall = true;
+                document.getElementsByClassName(`grid-${i}-${j}`)[0].style.backgroundColor = 'Grey';
+                document.getElementsByClassName(`grid-${i}-${j}`)[0].classList.remove('not-found');
+                document.getElementsByClassName(`grid-${i}-${j}`)[0].classList.add('wall');
+            }
+        }
+    }
 }
