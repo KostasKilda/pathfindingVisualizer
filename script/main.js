@@ -281,7 +281,7 @@ async function finalNode() {
 
         backTrackNode.element.style.backgroundColor = 'blue';
 
-        await sleep(parseInt(200/backTracingSpeed.value));
+        await sleep(parseInt(100/backTracingSpeed.value));
     }
 
 }
