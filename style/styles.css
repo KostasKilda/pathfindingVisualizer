@@ -1,4 +1,10 @@
-.board{
+body,
+html {
+    margin: 0;
+    padding: 0;
+}
+
+.board {
     width: 80%;
     margin-top: 0px;
     display: flex;
@@ -6,10 +12,109 @@
     align-items: center;
 }
 
+.controls {
+    width: 100%;
+    background-color: black;
+    margin: 0;
+    height: 140px;
+}
 
-.grid-cell{
+.grid-cell {
+    margin: 0;
     border: 1px solid black;
     width: 20px;
     height: 20px;
     background-color: white;
+}
+
+.foundElement {
+    background: #1592e6;
+    animation: fillBackground 0.5s linear forwards;
+}
+
+@keyframes fillBackground {
+    0% {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        border-radius: 50%;
+        border: 1px solid black;
+    }
+
+    50% {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        border-radius: 75%;
+        border: 1px solid black;
+    }
+
+    100% {
+        width: 20px;
+        height: 20px;
+        border-radius: 0%;
+        background-color: #03fcf8;
+        border: 1px solid black;
+    }
+}
+
+.startNode{
+    background-color: #5be809;
+    animation: startingNode 4s linear infinite;
+}
+
+
+@keyframes startingNode {
+    0% {
+        background-color: #5be809;
+    }
+
+    40% {
+        background-color: #08c90f;
+    }
+
+    75% {
+        background-color: #0f912f;
+    }
+}
+
+
+.topWall21{
+    border-top: 0px;
+    height: 21px;
+}
+
+.bottomWall21{
+    border-bottom: 0px;
+    height: 21px;
+}
+
+.rightWall21{
+    border-right: 0px;
+    width: 21px;
+}
+
+.leftWall21{
+    border-left: 0px;
+    width: 21px;
+}
+
+.bottomWall22{
+    border-bottom: 0px;
+    height: 22px;
+}
+
+.topWall22{
+    border-top: 0px;
+    height: 22px;
+}
+
+.rightWall22{
+    border-right: 0px;
+    width: 22px;
+}
+
+.leftWall22{
+    border-left: 0px;
+    width: 22px;
 }

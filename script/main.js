@@ -19,8 +19,8 @@ let endNode = []
 function updateGrid() {
 
     // Adjusting the amount of rows and columns based on window size (90% width, 80% height)
-    rowAmount = parseInt(window.innerWidth/10*9/20)
-    columnAmount = parseInt(window.innerHeight/10*8/20);
+    rowAmount = parseInt(window.innerWidth / 10 * 9 / 20)
+    columnAmount = parseInt((window.innerHeight - 260) / 20);
 
     startEndFlags = 0
 
@@ -135,7 +135,6 @@ function updateCell(cell, mouseDown) {
 
     if (cellgrid.split(' ')[0] == 'grid-cell') {
         if (startEndFlags == 0) {
-            cellElement.style.backgroundColor = '#4BA351';
             cellElement.classList.remove("not-found");
             cellElement.classList.add("startNode");
             grid[index[1]][index[2]].isStartNode = true;
@@ -159,6 +158,7 @@ function updateCell(cell, mouseDown) {
             cellElement.classList.remove("not-found");
             cellElement.classList.add("wall");
             grid[index[1]][index[2]].isWall = true;
+            removeWallBorders(index[1], index[2])
         }
     }
 }
@@ -176,11 +176,51 @@ function removeWalls() {
         grid[index[1]][index[2]].isWall = false
     }
 
+    wallborders = Array.from(document.getElementsByClassName('topWall21'));
+    for (let i = 0; i <= (wallborders.length - 1); i++) {
+        wallborders[i].classList.remove("topWall21");
+    }
+
+    wallborders = Array.from(document.getElementsByClassName('topWall22'));
+    for (let i = 0; i <= (wallborders.length - 1); i++) {
+        wallborders[i].classList.remove("topWall22");
+    }
+
+    wallborders = Array.from(document.getElementsByClassName('rightWall21'));
+    for (let i = 0; i <= (wallborders.length - 1); i++) {
+        wallborders[i].classList.remove("rightWall21");
+    }
+
+    wallborders = Array.from(document.getElementsByClassName('rightWall22'));
+    for (let i = 0; i <= (wallborders.length - 1); i++) {
+        wallborders[i].classList.remove("rightWall22");
+    }
+
+    wallborders = Array.from(document.getElementsByClassName('leftWall21'));
+    for (let i = 0; i <= (wallborders.length - 1); i++) {
+        wallborders[i].classList.remove("leftWall21");
+    }
+
+    wallborders = Array.from(document.getElementsByClassName('leftWall22'));
+    for (let i = 0; i <= (wallborders.length - 1); i++) {
+        wallborders[i].classList.remove("leftWall22");
+    }
+
+    wallborders = Array.from(document.getElementsByClassName('bottomWall21'));
+    for (let i = 0; i <= (wallborders.length - 1); i++) {
+        wallborders[i].classList.remove("bottomWall21");
+    }
+
+    wallborders = Array.from(document.getElementsByClassName('bottomWall22'));
+    for (let i = 0; i <= (wallborders.length - 1); i++) {
+        wallborders[i].classList.remove("bottomWall22");
+    }
+
 }
 
 
 // Event listener for pathfinding speed slider
-function changeAlgorithmSpeed(){
+function changeAlgorithmSpeed() {
     algorithmSpeed = document.getElementById('algorithm-speed')
     document.getElementsByClassName('Algorithm speed')[0].innerHTML = `${algorithmSpeed.value}x`
 }
@@ -210,22 +250,23 @@ async function dijkstrasPathfinding() {
             break;
         }
         for (let i = neighborNodes.length - 1; i >= 0; i--) {
-            
+
             if (neighborNodes[i].isEndNode) {
                 foundEndNode = true
             }
 
             if (neighborNodes[i].isEndNode == false) {
-                neighborNodes[i].element.style.backgroundColor = 'yellow';
+                neighborNodes[i].element.classList.add('foundElement');
             }
 
             currentNodes.push(neighborNodes[i])
             neighborNodes.pop(i);
         }
 
-        await sleep(parseInt(250/algorithmSpeed.value));
+        await sleep(parseInt(250 / algorithmSpeed.value));
     }
 
+    await sleep(500);
     finalNode()
 }
 
@@ -265,30 +306,129 @@ async function finalNode() {
     targetNode = grid[startNode[0]][startNode[1]]
     backTrackNode = grid[endNode[0]][endNode[1]]
 
-    while(targetNode != backTrackNode){
+    while (targetNode != backTrackNode) {
         backTrackNode = backTrackNode.pastNode
+        backTrackNode.element.classList.remove('foundElement')
 
-        if(targetNode == backTrackNode){
+        if (targetNode == backTrackNode) {
             break;
         }
 
-        backTrackNode.element.style.backgroundColor = 'blue';
+        backTrackNode.element.style.backgroundColor = '#ffab03';
 
-        await sleep(parseInt(100/algorithmSpeed.value));
+        await sleep(parseInt(100 / algorithmSpeed.value));
     }
 
 }
 
 
-function generateWalls(){
+function generateWalls() {
     for (let i = 0; i < rowAmount; i++) {
         for (let j = 0; j < columnAmount; j++) {
-            if((Math.random() >= 0.75) && !(grid[i][j].isEndNode) && !(grid[i][j].isStartNode)){
+            if ((Math.random() >= 0.75) && !(grid[i][j].isEndNode) && !(grid[i][j].isStartNode)) {
                 grid[i][j].isWall = true;
                 document.getElementsByClassName(`grid-${i}-${j}`)[0].style.backgroundColor = 'Grey';
                 document.getElementsByClassName(`grid-${i}-${j}`)[0].classList.remove('not-found');
                 document.getElementsByClassName(`grid-${i}-${j}`)[0].classList.add('wall');
+                removeWallBorders(i, j);
             }
         }
+    }
+
+    // for (let i = 0; i < rowAmount; i++) {
+    //     for (let j = 0; j < columnAmount; j++) {
+    //         if (grid[i][j].isWall)
+    //             removeWallBorders(i, j)
+    //     }
+    // }
+}
+
+
+
+function removeWallBorders(row, col) {
+
+    row = parseInt(row)
+    col = parseInt(col)
+
+    if (grid[row][col].isWall) {
+
+        leftCriteria = (row != 0) && (grid[row - 1][col].isWall);
+        topCriteria = (col != 0) && (grid[row][col - 1].isWall);
+        rightCriteria = (row != rowAmount - 1) && (grid[row + 1][col].isWall)
+        bottomCriteria = (col != columnAmount - 1) && (grid[row][col + 1].isWall)
+
+
+        // Merges walls from the left of the node
+        if (leftCriteria) {
+            if (window.getComputedStyle(grid[row - 1][col].element).borderLeft == '0px none rgb(0, 0, 0)') {
+                grid[row - 1][col].element.classList.add('rightWall22')
+            }
+            else {
+                grid[row - 1][col].element.classList.add('rightWall21')
+            }
+
+            if(window.getComputedStyle(grid[row][col].element).borderRight == '0px none rgb(0, 0, 0)'){
+                grid[row][col].element.classList.add('leftWall22')
+            }
+            else{
+                grid[row][col].element.classList.add('leftWall21')
+            }
+        }
+
+
+        // Merges walls from the top of the node
+        if (topCriteria) {
+            if (window.getComputedStyle(grid[row][col - 1].element).borderTop == '0px none rgb(0, 0, 0)') {
+                grid[row][col - 1].element.classList.add('bottomWall22')
+            }
+            else {
+                grid[row][col - 1].element.classList.add('bottomWall21')
+            }
+
+            if(window.getComputedStyle(grid[row][col].element).borderBottom == '0px none rgb(0, 0, 0)'){
+                grid[row][col].element.classList.add('topWall22')
+            }
+            else{
+                grid[row][col].element.classList.add('topWall21')
+            }
+
+        }
+        
+
+        // Merges walls from the right of the node
+        if (rightCriteria) {
+            if (window.getComputedStyle(grid[row + 1][col].element).borderRight == '0px none rgb(0, 0, 0)') {
+                grid[row + 1][col].element.classList.add('leftWall22')
+            }
+            else {
+                grid[row + 1][col].element.classList.add('leftWall21')
+            }
+
+            if(window.getComputedStyle(grid[row][col].element).borderLeft == '0px none rgb(0, 0, 0)'){
+                grid[row][col].element.classList.add('rightWall22')
+            }
+            else{
+                grid[row][col].element.classList.add('rightWall21')
+            }
+        }
+
+
+        // Merges walls from the right of the node
+        if (bottomCriteria) {
+            if (window.getComputedStyle(grid[row][col + 1].element).borderBottom == '0px none rgb(0, 0, 0)') {
+                grid[row][col + 1].element.classList.add('topWall22')
+            }
+            else {
+                grid[row][col + 1].element.classList.add('topWall21')
+            }
+
+            if(window.getComputedStyle(grid[row][col].element).borderTop == '0px none rgb(0, 0, 0)'){
+                grid[row][col].element.classList.add('bottomWall22')
+            }
+            else{
+                grid[row][col].element.classList.add('bottomWall21')
+            }
+        }
+
     }
 }

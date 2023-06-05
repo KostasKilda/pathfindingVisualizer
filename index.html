@@ -13,6 +13,10 @@
 </head>
 
 <body>
+
+    <div class="controls"></div>
+
+
     <div>
         <div class="grid-amount">
             Algorithm speed <span class="Algorithm speed"></span>
@@ -21,35 +25,35 @@
     </div>
 
     <span>
-    <span>
-        <button onclick="updateGrid()">
-            Clear
-        </button>
-    </span>
-    </span>
-
-    <span>
-    <span>
-        <button onclick="removeWalls()">
-            Remove walls
-        </button>
-    </span>
+        <span>
+            <button onclick="updateGrid()">
+                Clear
+            </button>
+        </span>
     </span>
 
     <span>
-    <span>
-        <button onclick="generateWalls()">
-            Generate walls
-        </button>
-    </span>
+        <span>
+            <button onclick="removeWalls()">
+                Remove walls
+            </button>
+        </span>
     </span>
 
     <span>
-    <span>
-        <button onclick="dijkstrasPathfinding()">
-            Pathfind
-        </button>
+        <span>
+            <button onclick="generateWalls()">
+                Generate walls
+            </button>
+        </span>
     </span>
+
+    <span>
+        <span>
+            <button onclick="dijkstrasPathfinding()">
+                Pathfind
+            </button>
+        </span>
     </span>
 
     <div style="display: flex; align-items: center; justify-content: center;">
