@@ -15,12 +15,21 @@ let grid = [];
 let startNode = []
 let endNode = []
 
+
+// 0 - Algorithm has not been run, 1 - Alrotihm is in progress, 2 - Algorithm has finished running
+let algorithmRun = 0
+
 // Creating the grid system
 function updateGrid() {
 
-    // Adjusting the amount of rows and columns based on window size (90% width, 80% height)
+    if(algorithmRun == 1){
+        return
+    }
+
+    algorithmRun = 0;
+
     rowAmount = parseInt(window.innerWidth / 10 * 9 / 20)
-    columnAmount = parseInt((window.innerHeight - 260) / 20);
+    columnAmount = parseInt((window.innerHeight - parseInt(document.getElementsByClassName('controls')[0].clientHeight) - 140) / 20);
 
     startEndFlags = 0
 
@@ -126,9 +135,13 @@ function updateCell(cell, mouseDown) {
         cellElement = cell.srcElement;
     }
 
+    if(cellElement.attributes.class == null){
+        return
+    }
+
     cellgrid = cellElement.attributes.class.textContent;
 
-    if ((cellgrid == 'grid-row') || (cellgrid == 'board')) {
+    if(!(cellgrid.includes('grid-cell'))){
         return
     }
 
@@ -166,6 +179,14 @@ function updateCell(cell, mouseDown) {
 
 
 function removeWalls() {
+
+    if (algorithmRun == 2){
+        updateGrid();
+    }
+    else if(algorithmRun == 1){
+        return
+    }
+
     walls = document.getElementsByClassName('wall');
     let wallArray = Array.from(walls);
 
@@ -230,6 +251,14 @@ function changeAlgorithmSpeed() {
 
 
 function generateWalls() {
+
+    if (algorithmRun == 2){
+        updateGrid();
+    }
+    else if(algorithmRun == 1){
+        return
+    }
+
     for (let i = 0; i < rowAmount; i++) {
         for (let j = 0; j < columnAmount; j++) {
             if ((Math.random() >= 0.75) && !(grid[i][j].isEndNode) && !(grid[i][j].isStartNode)) {
@@ -332,6 +361,23 @@ function removeWallBorders(row, col) {
 
     }
 }
+
+// Algorithm selection menu
+function startAlgorithm(){
+    algorithmRun = 1;
+
+    let selectedOption = dropdown.querySelector('option:checked');
+
+    // Checking for null variables (start/end nodes)
+    if((startNode[0] == null) || (startNode[1] == null) || (endNode[0] == null) || (endNode[1] == null)){
+        return
+    }
+
+    if(selectedOption.value == 'Dijkstras' || selectedOption.value == 'BFS'){
+        dijkstrasPathfinding();
+    }
+}
+
 
 
 
@@ -481,5 +527,7 @@ async function finalNode() {
 
         await sleep(parseInt(100 / algorithmSpeed.value));
     }
+
+    algorithmRun = 2;
 
 }

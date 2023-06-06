@@ -6,6 +6,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="style/styles.css">
 
     <title>Pathfinding visualizer</title>
@@ -14,47 +19,109 @@
 
 <body>
 
-    <div class="controls"></div>
+    <div class="controls">
+        <div class="gridControl">
+            <div class="algorithmControls">
+                <div class="buttonSpacing">
+                    <div class="grid-amount">
+                        Algorithm speed <span class="Algorithm speed"></span>
+                    </div>
+                    <div class="slider-wrapper">
+                        <input type="range" min="0.2" max="5" value="1" step="0.2" class="slider" id="algorithm-speed">
+                    </div>
+                </div>
 
+                <div class="buttonSpacing">
+                    <select id="dropdown">
+                        <option value="Dijkstras" id="Dijkstra" selected>Dijkstra's algorithm</option>
+                        <option value="BFS" id="BFS">Breadth first search</option>
+                    </select>
+                </div>
 
-    <div>
-        <div class="grid-amount">
-            Algorithm speed <span class="Algorithm speed"></span>
+                <div class="buttonSpacing">
+                    <div class="buttonDiv">
+                        <button class="functionBtn" style="background-color: #228a00;" onclick="startAlgorithm()">
+                            Pathfind
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="clear">
+                <div class="buttonDiv">
+                    <button class="functionBtn" onclick="generateWalls()">
+                        Generate walls
+                    </button>
+                </div>
+            </div>
+
+            <div class="wallControls">
+                <div class="buttonDiv">
+                    <button class="functionBtn" style="background-color: #c90a1a;" onclick="removeWalls()">
+                        Remove walls
+                    </button>
+                </div>
+
+                <div class="buttonDiv">
+                    <button class="functionBtn" style="background-color: #c90a1a;" onclick="updateGrid()">
+                        Clear
+                    </button>
+                </div>
+            </div>
         </div>
-        <input type="range" min="0.2" max="5" value="1" step="0.2" class="slider" id="algorithm-speed">
+
+        <div class="legend">
+            <div class="showcase-legend">
+                <div>
+                    Unvisited Node -
+                </div>
+                <div class="cell-legend-wrapper">
+                    <div class="grid-cell-legend" style="background-color: white;"></div>
+                </div>
+                
+            </div>
+
+            <div class="showcase-legend">
+                <div>
+                    Visited Node -
+                </div>
+                <div class="cell-legend-wrapper">
+                    <div class="grid-cell-legend" style="background-color: #03fcf8;"></div>
+                </div>
+            </div>
+
+            <div class="showcase-legend">
+                <div>
+                    Star Node -
+                </div>
+                <div class="cell-legend-wrapper">
+                    <div class="grid-cell-legend" style="background-color: #08c90f;"></div>
+                </div>
+            </div>
+
+            <div class="showcase-legend">
+                <div>
+                    End Node -
+                </div>
+                <div class="cell-legend-wrapper">
+                    <div class="grid-cell-legend" style="background-color: Red;"></div>
+                </div>
+            </div>
+
+            <div class="showcase-legend">
+                <div>
+                    Wall Node -
+                </div>
+                <div class="cell-legend-wrapper">
+                    <div class="grid-cell-legend" style="background-color: Grey;"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <span>
-        <span>
-            <button onclick="updateGrid()">
-                Clear
-            </button>
-        </span>
-    </span>
 
-    <span>
-        <span>
-            <button onclick="removeWalls()">
-                Remove walls
-            </button>
-        </span>
-    </span>
 
-    <span>
-        <span>
-            <button onclick="generateWalls()">
-                Generate walls
-            </button>
-        </span>
-    </span>
 
-    <span>
-        <span>
-            <button onclick="dijkstrasPathfinding()">
-                Pathfind
-            </button>
-        </span>
-    </span>
 
     <div style="display: flex; align-items: center; justify-content: center;">
         <div class="board">
