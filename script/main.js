@@ -57,6 +57,7 @@ function updateGrid() {
                 isWall: false,
                 cost: 1,
                 visited: false,
+                lastDirection: null,
             };
         }
     }
@@ -226,6 +227,117 @@ function changeAlgorithmSpeed() {
 }
 
 
+
+
+function generateWalls() {
+    for (let i = 0; i < rowAmount; i++) {
+        for (let j = 0; j < columnAmount; j++) {
+            if ((Math.random() >= 0.75) && !(grid[i][j].isEndNode) && !(grid[i][j].isStartNode)) {
+                grid[i][j].isWall = true;
+                document.getElementsByClassName(`grid-${i}-${j}`)[0].style.backgroundColor = 'Grey';
+                document.getElementsByClassName(`grid-${i}-${j}`)[0].classList.remove('not-found');
+                document.getElementsByClassName(`grid-${i}-${j}`)[0].classList.add('wall');
+                removeWallBorders(i, j);
+            }
+        }
+    }
+}
+
+
+
+function removeWallBorders(row, col) {
+
+    row = parseInt(row)
+    col = parseInt(col)
+
+    if (grid[row][col].isWall) {
+
+        leftCriteria = (row != 0) && (grid[row - 1][col].isWall);
+        topCriteria = (col != 0) && (grid[row][col - 1].isWall);
+        rightCriteria = (row != rowAmount - 1) && (grid[row + 1][col].isWall)
+        bottomCriteria = (col != columnAmount - 1) && (grid[row][col + 1].isWall)
+
+
+        // Merges walls from the left of the node
+        if (leftCriteria) {
+            if (window.getComputedStyle(grid[row - 1][col].element).borderLeft == '0px none rgb(0, 0, 0)') {
+                grid[row - 1][col].element.classList.add('rightWall22')
+            }
+            else {
+                grid[row - 1][col].element.classList.add('rightWall21')
+            }
+
+            if (window.getComputedStyle(grid[row][col].element).borderRight == '0px none rgb(0, 0, 0)') {
+                grid[row][col].element.classList.add('leftWall22')
+            }
+            else {
+                grid[row][col].element.classList.add('leftWall21')
+            }
+        }
+
+
+        // Merges walls from the top of the node
+        if (topCriteria) {
+            if (window.getComputedStyle(grid[row][col - 1].element).borderTop == '0px none rgb(0, 0, 0)') {
+                grid[row][col - 1].element.classList.add('bottomWall22')
+            }
+            else {
+                grid[row][col - 1].element.classList.add('bottomWall21')
+            }
+
+            if (window.getComputedStyle(grid[row][col].element).borderBottom == '0px none rgb(0, 0, 0)') {
+                grid[row][col].element.classList.add('topWall22')
+            }
+            else {
+                grid[row][col].element.classList.add('topWall21')
+            }
+
+        }
+
+
+        // Merges walls from the right of the node
+        if (rightCriteria) {
+            if (window.getComputedStyle(grid[row + 1][col].element).borderRight == '0px none rgb(0, 0, 0)') {
+                grid[row + 1][col].element.classList.add('leftWall22')
+            }
+            else {
+                grid[row + 1][col].element.classList.add('leftWall21')
+            }
+
+            if (window.getComputedStyle(grid[row][col].element).borderLeft == '0px none rgb(0, 0, 0)') {
+                grid[row][col].element.classList.add('rightWall22')
+            }
+            else {
+                grid[row][col].element.classList.add('rightWall21')
+            }
+        }
+
+
+        // Merges walls from the right of the node
+        if (bottomCriteria) {
+            if (window.getComputedStyle(grid[row][col + 1].element).borderBottom == '0px none rgb(0, 0, 0)') {
+                grid[row][col + 1].element.classList.add('topWall22')
+            }
+            else {
+                grid[row][col + 1].element.classList.add('topWall21')
+            }
+
+            if (window.getComputedStyle(grid[row][col].element).borderTop == '0px none rgb(0, 0, 0)') {
+                grid[row][col].element.classList.add('bottomWall22')
+            }
+            else {
+                grid[row][col].element.classList.add('bottomWall21')
+            }
+        }
+
+    }
+}
+
+
+
+
+// Dijkstras algorithm
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -266,8 +378,10 @@ async function dijkstrasPathfinding() {
         await sleep(parseInt(250 / algorithmSpeed.value));
     }
 
-    await sleep(500);
-    finalNode()
+    if (foundEndNode == true) {
+        await sleep(500);
+        finalNode()
+    }
 }
 
 function getNeighbors(node, neighborNodes) {
@@ -276,24 +390,28 @@ function getNeighbors(node, neighborNodes) {
 
     if ((col > 0) && !(grid[row][col - 1].isWall) && !(grid[row][col - 1].visited)) {
         grid[row][col - 1].visited = true;
+        grid[row][col - 1].lastDirection = 'bottom';
         grid[row][col - 1].pastNode = node;
         neighborNodes.push(grid[row][col - 1])
     }
 
     if ((row + 1 < rowAmount) && !(grid[row + 1][col].isWall) && !(grid[row + 1][col].visited)) {
         grid[row + 1][col].visited = true;
+        grid[row + 1][col].lastDirection = 'left';
         grid[row + 1][col].pastNode = node;
         neighborNodes.push(grid[row + 1][col])
     }
 
     if ((col + 1 < columnAmount) && !(grid[row][col + 1].isWall) && !(grid[row][col + 1].visited)) {
         grid[row][col + 1].visited = true;
+        grid[row][col + 1].lastDirection = 'top';
         grid[row][col + 1].pastNode = node;
         neighborNodes.push(grid[row][col + 1])
     }
 
     if ((row > 0) && !(grid[row - 1][col].isWall) && !(grid[row - 1][col].visited)) {
         grid[row - 1][col].visited = true;
+        grid[row - 1][col].lastDirection = 'right';
         grid[row - 1][col].pastNode = node;
         neighborNodes.push(grid[row - 1][col])
     }
@@ -306,11 +424,56 @@ async function finalNode() {
     targetNode = grid[startNode[0]][startNode[1]]
     backTrackNode = grid[endNode[0]][endNode[1]]
 
-    while (targetNode != backTrackNode) {
-        backTrackNode = backTrackNode.pastNode
-        backTrackNode.element.classList.remove('foundElement')
+    if (backTrackNode.lastDirection == 'left'){
+        backTrackNode.element.classList.add('leftWall21')
+    }
+    else if (backTrackNode.lastDirection == 'right'){
+        backTrackNode.element.classList.add('rightWall21')
+    }
+    else if (backTrackNode.lastDirection == 'top'){
+        backTrackNode.element.classList.add('topWall21')
+    }
+    else if (backTrackNode.lastDirection == 'bottom'){
+        backTrackNode.element.classList.add('bottomWall21')
+    }
 
+    while (targetNode != backTrackNode) {
+        previousNodeDirection = backTrackNode.lastDirection
+        backTrackNode = backTrackNode.pastNode
+        if ((previousNodeDirection == 'top') && (backTrackNode.lastDirection == 'top') || ((previousNodeDirection == 'bottom') && (backTrackNode.lastDirection == 'bottom'))) {
+            backTrackNode.element.classList.add('topBottomBacktrack')
+        }
+        else if (((previousNodeDirection == 'right') && (backTrackNode.lastDirection == 'right')) || ((previousNodeDirection == 'left') && (backTrackNode.lastDirection == 'left'))) {
+            backTrackNode.element.classList.add('leftRightBacktrack')
+        }
+        else if (((previousNodeDirection == 'top') && (backTrackNode.lastDirection == 'left')) || ((previousNodeDirection == 'right') && (backTrackNode.lastDirection == 'bottom'))) {
+            backTrackNode.element.classList.add('topLeftBacktrack')
+        }
+        else if (((previousNodeDirection == 'top') && (backTrackNode.lastDirection == 'right')) || ((previousNodeDirection == 'left') && (backTrackNode.lastDirection == 'bottom'))) {
+            backTrackNode.element.classList.add('topRightBacktrack')
+        }
+        else if (((previousNodeDirection == 'bottom') && (backTrackNode.lastDirection == 'right')) || ((previousNodeDirection == 'left') && (backTrackNode.lastDirection == 'top'))) {
+            backTrackNode.element.classList.add('bottomRightBacktrack')
+        }
+        else if (((previousNodeDirection == 'bottom') && (backTrackNode.lastDirection == 'left')) || ((previousNodeDirection == 'right') && (backTrackNode.lastDirection == 'top'))) {
+            backTrackNode.element.classList.add('bottomLeftBacktrack')
+        }
+
+
+        backTrackNode.element.classList.remove('foundElement')
         if (targetNode == backTrackNode) {
+            if (previousNodeDirection == 'left') {
+                backTrackNode.element.classList.add('rightWall21')
+            }
+            else if (previousNodeDirection == 'right') {
+                backTrackNode.element.classList.add('leftWall21')
+            }
+            else if (previousNodeDirection == 'top') {
+                backTrackNode.element.classList.add('bottomWall21')
+            }
+            else if (previousNodeDirection == 'bottom') {
+                backTrackNode.element.classList.add('topWall21')
+            }
             break;
         }
 
@@ -319,116 +482,4 @@ async function finalNode() {
         await sleep(parseInt(100 / algorithmSpeed.value));
     }
 
-}
-
-
-function generateWalls() {
-    for (let i = 0; i < rowAmount; i++) {
-        for (let j = 0; j < columnAmount; j++) {
-            if ((Math.random() >= 0.75) && !(grid[i][j].isEndNode) && !(grid[i][j].isStartNode)) {
-                grid[i][j].isWall = true;
-                document.getElementsByClassName(`grid-${i}-${j}`)[0].style.backgroundColor = 'Grey';
-                document.getElementsByClassName(`grid-${i}-${j}`)[0].classList.remove('not-found');
-                document.getElementsByClassName(`grid-${i}-${j}`)[0].classList.add('wall');
-                removeWallBorders(i, j);
-            }
-        }
-    }
-
-    // for (let i = 0; i < rowAmount; i++) {
-    //     for (let j = 0; j < columnAmount; j++) {
-    //         if (grid[i][j].isWall)
-    //             removeWallBorders(i, j)
-    //     }
-    // }
-}
-
-
-
-function removeWallBorders(row, col) {
-
-    row = parseInt(row)
-    col = parseInt(col)
-
-    if (grid[row][col].isWall) {
-
-        leftCriteria = (row != 0) && (grid[row - 1][col].isWall);
-        topCriteria = (col != 0) && (grid[row][col - 1].isWall);
-        rightCriteria = (row != rowAmount - 1) && (grid[row + 1][col].isWall)
-        bottomCriteria = (col != columnAmount - 1) && (grid[row][col + 1].isWall)
-
-
-        // Merges walls from the left of the node
-        if (leftCriteria) {
-            if (window.getComputedStyle(grid[row - 1][col].element).borderLeft == '0px none rgb(0, 0, 0)') {
-                grid[row - 1][col].element.classList.add('rightWall22')
-            }
-            else {
-                grid[row - 1][col].element.classList.add('rightWall21')
-            }
-
-            if(window.getComputedStyle(grid[row][col].element).borderRight == '0px none rgb(0, 0, 0)'){
-                grid[row][col].element.classList.add('leftWall22')
-            }
-            else{
-                grid[row][col].element.classList.add('leftWall21')
-            }
-        }
-
-
-        // Merges walls from the top of the node
-        if (topCriteria) {
-            if (window.getComputedStyle(grid[row][col - 1].element).borderTop == '0px none rgb(0, 0, 0)') {
-                grid[row][col - 1].element.classList.add('bottomWall22')
-            }
-            else {
-                grid[row][col - 1].element.classList.add('bottomWall21')
-            }
-
-            if(window.getComputedStyle(grid[row][col].element).borderBottom == '0px none rgb(0, 0, 0)'){
-                grid[row][col].element.classList.add('topWall22')
-            }
-            else{
-                grid[row][col].element.classList.add('topWall21')
-            }
-
-        }
-        
-
-        // Merges walls from the right of the node
-        if (rightCriteria) {
-            if (window.getComputedStyle(grid[row + 1][col].element).borderRight == '0px none rgb(0, 0, 0)') {
-                grid[row + 1][col].element.classList.add('leftWall22')
-            }
-            else {
-                grid[row + 1][col].element.classList.add('leftWall21')
-            }
-
-            if(window.getComputedStyle(grid[row][col].element).borderLeft == '0px none rgb(0, 0, 0)'){
-                grid[row][col].element.classList.add('rightWall22')
-            }
-            else{
-                grid[row][col].element.classList.add('rightWall21')
-            }
-        }
-
-
-        // Merges walls from the right of the node
-        if (bottomCriteria) {
-            if (window.getComputedStyle(grid[row][col + 1].element).borderBottom == '0px none rgb(0, 0, 0)') {
-                grid[row][col + 1].element.classList.add('topWall22')
-            }
-            else {
-                grid[row][col + 1].element.classList.add('topWall21')
-            }
-
-            if(window.getComputedStyle(grid[row][col].element).borderTop == '0px none rgb(0, 0, 0)'){
-                grid[row][col].element.classList.add('bottomWall22')
-            }
-            else{
-                grid[row][col].element.classList.add('bottomWall21')
-            }
-        }
-
-    }
 }
