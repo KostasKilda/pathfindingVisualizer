@@ -79,7 +79,7 @@ function updateGrid() {
 
 updateGrid();
 
-var isLeftMouseDown = false;
+let isLeftMouseDown = false;
 
 
 // Event handler for mouse down
