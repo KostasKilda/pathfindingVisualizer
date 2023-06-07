@@ -1,10 +1,14 @@
+
 let startEndFlags = 0
+
 const container = document.getElementsByClassName('board')[0];
 
+
+// Variables containing total row & column amount in the board
 let rowAmount = 0
 let columnAmount = 0
 
-
+// Event listener for algorithm speed slider
 let algorithmSpeed = document.getElementById('algorithm-speed')
 algorithmSpeed.addEventListener("change", changeAlgorithmSpeed)
 changeAlgorithmSpeed();
@@ -19,15 +23,18 @@ let endNode = []
 // 0 - Algorithm has not been run, 1 - Alrotihm is in progress, 2 - Algorithm has finished running
 let algorithmRun = 0
 
-// Creating the grid system
+
+// Creates the grid system dynamically
 function updateGrid() {
 
-    if(algorithmRun == 1){
+    // Checks if the algorithm is running, if so returns
+    if (algorithmRun == 1) {
         return
     }
 
     algorithmRun = 0;
 
+    // Dynamically determines the row and column amount for the user
     rowAmount = parseInt(window.innerWidth / 10 * 9 / 20)
     columnAmount = parseInt((window.innerHeight - parseInt(document.getElementsByClassName('controls')[0].clientHeight) - 140) / 20);
 
@@ -36,7 +43,7 @@ function updateGrid() {
     // Clearing innerHTML
     container.innerHTML = '';
 
-    // Adding the grid
+    // Adds cells to the board
     for (let i = 0; i < rowAmount; i++) {
 
         let row = document.createElement('div');
@@ -53,8 +60,7 @@ function updateGrid() {
         container.appendChild(row);
     }
 
-
-    // Creating a graph object using 2D array
+    // Creates a graph object using 2D array
     for (let i = 0; i < rowAmount; i++) {
         grid[i] = [];
         for (let j = 0; j < columnAmount; j++) {
@@ -70,7 +76,6 @@ function updateGrid() {
             };
         }
     }
-
     startNode = []
     endNode = []
 
@@ -79,41 +84,38 @@ function updateGrid() {
 
 updateGrid();
 
+
+
+// Mouse down action listeners
 let isLeftMouseDown = false;
 
-
-// Event handler for mouse down
-function handleMouseDown(event) {
-    if (event.button === 0) {
-        // Left mouse button is pressed
-        isLeftMouseDown = true;
-    }
-}
-
-// Event handler for mouse up
-function handleMouseUp(event) {
-    if (event.button === 0) {
-        // Left mouse button is released
-        isLeftMouseDown = false;
-    }
-}
-
-// Event handler for mouse move
-function handleMouseMove(event) {
-    if (isLeftMouseDown) {
-        // Left mouse button is being held down
-        updateCell(event.target, true);
-    }
-}
-
-// Attach event listeners
 document.addEventListener('mousedown', handleMouseDown);
 document.addEventListener('mouseup', handleMouseUp);
 document.addEventListener('mousemove', handleMouseMove);
 
+// Left mouse button is pressed
+function handleMouseDown(event) {
+    if (event.button === 0) {
+        isLeftMouseDown = true;
+    }
+}
+
+// Left mouse button is released
+function handleMouseUp(event) {
+    if (event.button === 0) {
+        isLeftMouseDown = false;
+    }
+}
+
+// Left mouse button is being held down
+function handleMouseMove(event) {
+    if (isLeftMouseDown) {
+        updateCell(event.target, true);
+    }
+}
 
 
-
+// Adds event listener to each grid cell
 function cellEventListener() {
     let cell = document.getElementsByClassName('grid-cell');
 
@@ -135,55 +137,58 @@ function updateCell(cell, mouseDown) {
         cellElement = cell.srcElement;
     }
 
-    if(cellElement.attributes.class == null){
+    if (cellElement.attributes.class == null) {
         return
     }
 
     cellgrid = cellElement.attributes.class.textContent;
 
-    if(!(cellgrid.includes('grid-cell'))){
+    if (!(cellgrid.includes('grid-cell'))) {
         return
     }
 
     index = cellgrid.split(' ')[1].split('-')
 
-    if (cellgrid.split(' ')[0] == 'grid-cell') {
-        if (startEndFlags == 0) {
-            cellElement.classList.remove("not-found");
-            cellElement.classList.add("startNode");
-            grid[index[1]][index[2]].isStartNode = true;
-            grid[index[1]][index[2]].visited = true;
-            grid[index[1]][index[2]].cost = 0;
-            startNode.push(index[1])
-            startNode.push(index[2])
-            startEndFlags += 1;
-        }
-        else if ((startEndFlags == 1) && (cellgrid.split(" ")[2] != "startNode")) {
-            cellElement.style.backgroundColor = 'Red';
-            cellElement.classList.remove("not-found");
-            cellElement.classList.add("endNode");
-            grid[index[1]][index[2]].isEndNode = true;
-            endNode.push(index[1])
-            endNode.push(index[2])
-            startEndFlags += 1;
-        }
-        else if ((cellgrid.split(" ")[2] != "endNode") && (cellgrid.split(" ")[2] != "startNode")) {
-            cellElement.style.backgroundColor = 'Grey';
-            cellElement.classList.remove("not-found");
-            cellElement.classList.add("wall");
-            grid[index[1]][index[2]].isWall = true;
-            removeWallBorders(index[1], index[2])
-        }
+
+    // Starting node
+    if (startEndFlags == 0) {
+        cellElement.classList.remove("not-found");
+        cellElement.classList.add("startNode");
+        grid[index[1]][index[2]].isStartNode = true;
+        grid[index[1]][index[2]].visited = true;
+        grid[index[1]][index[2]].cost = 0;
+        startNode.push(index[1])
+        startNode.push(index[2])
+        startEndFlags += 1;
     }
+    // End node
+    else if ((startEndFlags == 1) && (cellgrid.split(" ")[2] != "startNode")) {
+        cellElement.style.backgroundColor = 'Red';
+        cellElement.classList.remove("not-found");
+        cellElement.classList.add("endNode");
+        grid[index[1]][index[2]].isEndNode = true;
+        endNode.push(index[1])
+        endNode.push(index[2])
+        startEndFlags += 1;
+    }
+    // Wall Node
+    else if ((cellgrid.split(" ")[2] != "endNode") && (cellgrid.split(" ")[2] != "startNode") && !(grid[index[1]][index[2]].visited)) {
+        cellElement.style.backgroundColor = 'Grey';
+        cellElement.classList.remove("not-found");
+        cellElement.classList.add("wall");
+        grid[index[1]][index[2]].isWall = true;
+        removeWallBorders(index[1], index[2])
+    }
+
 }
 
-
+// Removes all the walls from the grid. It the grid has already been run, completelly resets the grid
 function removeWalls() {
 
-    if (algorithmRun == 2){
+    if (algorithmRun == 2) {
         updateGrid();
     }
-    else if(algorithmRun == 1){
+    else if (algorithmRun == 1) {
         return
     }
 
@@ -198,6 +203,7 @@ function removeWalls() {
         grid[index[1]][index[2]].isWall = false
     }
 
+    // Dynamically determines which class should be added
     wallborders = Array.from(document.getElementsByClassName('topWall21'));
     for (let i = 0; i <= (wallborders.length - 1); i++) {
         wallborders[i].classList.remove("topWall21");
@@ -252,10 +258,10 @@ function changeAlgorithmSpeed() {
 
 function generateWalls() {
 
-    if (algorithmRun == 2){
+    if (algorithmRun == 2) {
         updateGrid();
     }
-    else if(algorithmRun == 1){
+    else if (algorithmRun == 1) {
         return
     }
 
@@ -363,17 +369,17 @@ function removeWallBorders(row, col) {
 }
 
 // Algorithm selection menu
-function startAlgorithm(){
+function startAlgorithm() {
     algorithmRun = 1;
 
     let selectedOption = dropdown.querySelector('option:checked');
 
     // Checking for null variables (start/end nodes)
-    if((startNode[0] == null) || (startNode[1] == null) || (endNode[0] == null) || (endNode[1] == null)){
+    if ((startNode[0] == null) || (startNode[1] == null) || (endNode[0] == null) || (endNode[1] == null)) {
         return
     }
 
-    if(selectedOption.value == 'Dijkstras' || selectedOption.value == 'BFS'){
+    if (selectedOption.value == 'Dijkstras' || selectedOption.value == 'BFS') {
         dijkstrasPathfinding();
     }
 }
@@ -388,11 +394,12 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-
+// Dijkstras algorithm
 async function dijkstrasPathfinding() {
-    const startingNode = grid[startNode[0]][startNode[1]];
 
+    const startingNode = grid[startNode[0]][startNode[1]];
     const currentNodes = [grid[startNode[0]][startNode[1]]]
+
     const neighborNodes = []
     let foundEndNode = false
 
@@ -428,8 +435,14 @@ async function dijkstrasPathfinding() {
         await sleep(500);
         finalNode()
     }
+    else {
+        algorithmRun = 2;
+    }
 }
 
+
+
+// Find all neighbours from a cell that can be pathed to. Excludes walls and visited nodes
 function getNeighbors(node, neighborNodes) {
     row = parseInt(node.element.classList[1].split('-')[1])
     col = parseInt(node.element.classList[1].split('-')[2])
@@ -465,27 +478,31 @@ function getNeighbors(node, neighborNodes) {
 
 }
 
+// Creates a path from the endNode to the startNode
 async function finalNode() {
 
     targetNode = grid[startNode[0]][startNode[1]]
     backTrackNode = grid[endNode[0]][endNode[1]]
 
-    if (backTrackNode.lastDirection == 'left'){
+    if (backTrackNode.lastDirection == 'left') {
         backTrackNode.element.classList.add('leftWall21')
     }
-    else if (backTrackNode.lastDirection == 'right'){
+    else if (backTrackNode.lastDirection == 'right') {
         backTrackNode.element.classList.add('rightWall21')
     }
-    else if (backTrackNode.lastDirection == 'top'){
+    else if (backTrackNode.lastDirection == 'top') {
         backTrackNode.element.classList.add('topWall21')
     }
-    else if (backTrackNode.lastDirection == 'bottom'){
+    else if (backTrackNode.lastDirection == 'bottom') {
         backTrackNode.element.classList.add('bottomWall21')
     }
 
+    
     while (targetNode != backTrackNode) {
         previousNodeDirection = backTrackNode.lastDirection
         backTrackNode = backTrackNode.pastNode
+
+        // Removes the borders during backtrackNodes
         if ((previousNodeDirection == 'top') && (backTrackNode.lastDirection == 'top') || ((previousNodeDirection == 'bottom') && (backTrackNode.lastDirection == 'bottom'))) {
             backTrackNode.element.classList.add('topBottomBacktrack')
         }
@@ -505,7 +522,7 @@ async function finalNode() {
             backTrackNode.element.classList.add('bottomLeftBacktrack')
         }
 
-
+        // Edge case where the node is the targetNode
         backTrackNode.element.classList.remove('foundElement')
         if (targetNode == backTrackNode) {
             if (previousNodeDirection == 'left') {
@@ -523,8 +540,10 @@ async function finalNode() {
             break;
         }
 
+        // Update the backtract cell colour
         backTrackNode.element.style.backgroundColor = '#ffab03';
 
+        // Sleep for visual appeal
         await sleep(parseInt(100 / algorithmSpeed.value));
     }
 
