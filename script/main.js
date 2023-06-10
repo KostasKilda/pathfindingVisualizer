@@ -1,4 +1,3 @@
-
 let startEndFlags = 0
 
 const container = document.getElementsByClassName('board')[0];
@@ -382,6 +381,9 @@ function startAlgorithm() {
     if (selectedOption.value == 'Dijkstras' || selectedOption.value == 'BFS') {
         dijkstrasPathfinding();
     }
+    else if (selectedOption.value == 'DFS') {
+        DFS();
+    }
 }
 
 
@@ -397,7 +399,6 @@ function sleep(ms) {
 // Dijkstras algorithm
 async function dijkstrasPathfinding() {
 
-    const startingNode = grid[startNode[0]][startNode[1]];
     const currentNodes = [grid[startNode[0]][startNode[1]]]
 
     const neighborNodes = []
@@ -475,7 +476,6 @@ function getNeighbors(node, neighborNodes) {
         neighborNodes.push(grid[row - 1][col])
     }
     return;
-
 }
 
 // Creates a path from the endNode to the startNode
@@ -497,7 +497,7 @@ async function finalNode() {
         backTrackNode.element.classList.add('bottomWall21')
     }
 
-    
+
     while (targetNode != backTrackNode) {
         previousNodeDirection = backTrackNode.lastDirection
         backTrackNode = backTrackNode.pastNode
@@ -549,4 +549,121 @@ async function finalNode() {
 
     algorithmRun = 2;
 
+}
+
+
+async function DFS() {
+    let startingNode = grid[startNode[0]][startNode[1]]
+    const visitedNodesList = []
+    visitedNodesList.push(startingNode)
+    let direction = 'up'
+    let foundEndNode = false
+
+    k = 1
+
+    nextNode = DFSNeighbours(visitedNodesList, startingNode, 'up')
+    await sleep(parseInt(200 / algorithmSpeed.value));
+
+    while (foundEndNode == false) {
+        if (nextNode == null) {
+            // Edge case where there is no more edge nodes to explore
+            if (k == visitedNodesList.length) {
+                foundEndNode = true
+            }
+            nextNode = await DFSEdge(visitedNodesList[visitedNodesList.length - k], direction);
+            k++
+        }
+        if (nextNode != null) {
+
+            // Edge case where the end node has been found
+            if (nextNode.isEndNode == true) {
+                finalNode();
+                foundEndNode = true
+            }
+            else {
+                k = 1
+                nextNode.element.classList.remove('not-found');
+                nextNode.element.classList.add('foundElement');
+                nextNode = DFSNeighbours(visitedNodesList, nextNode, direction)
+                await sleep(parseInt(200 / algorithmSpeed.value));
+            }
+        }
+    }
+
+}
+
+
+// Find the next upcoming node in a predifined direction
+function DFSNeighbours(visitedNodesList, node, direction) {
+    visitedNodesList.push(node)
+
+    row = parseInt(node.element.classList[1].split('-')[1])
+    col = parseInt(node.element.classList[1].split('-')[2])
+
+
+    if ((col > 0) && !(grid[row][col - 1].isWall) && !(grid[row][col - 1].visited) && (direction == 'up')) {
+        grid[row][col - 1].lastDirection = 'bottom';
+        grid[row][col - 1].pastNode = node;
+        grid[row][col - 1].visited = true;
+        return grid[row][col - 1]
+    }
+    else if ((row + 1 < rowAmount) && !(grid[row + 1][col].isWall) && !(grid[row + 1][col].visited) && (direction == 'right')) {
+        grid[row + 1][col].visited = true;
+        grid[row + 1][col].lastDirection = 'left';
+        grid[row + 1][col].pastNode = node;
+        return grid[row + 1][col]
+    }
+    else if ((col + 1 < columnAmount) && !(grid[row][col + 1].isWall) && !(grid[row][col + 1].visited) && (direction == 'down')) {
+        grid[row][col + 1].visited = true;
+        grid[row][col + 1].lastDirection = 'top';
+        grid[row][col + 1].pastNode = node;
+        return grid[row][col + 1]
+    }
+    else if ((row > 0) && !(grid[row - 1][col].isWall) && !(grid[row - 1][col].visited) && (direction == 'left')) {
+        grid[row - 1][col].visited = true;
+        grid[row - 1][col].lastDirection = 'right';
+        grid[row - 1][col].pastNode = node;
+        return grid[row - 1][col]
+    }
+    return null
+}
+
+
+// Method that is called when DFS has to backtrack
+function DFSEdge(node, direction) {
+    console.log(node)
+    row = parseInt(node.element.classList[1].split('-')[1])
+    col = parseInt(node.element.classList[1].split('-')[2])
+
+    if ((col > 0) && !(grid[row][col - 1].isWall) && !(grid[row][col - 1].visited)) {
+        grid[row][col - 1].visited = true;
+        grid[row][col - 1].lastDirection = 'bottom';
+        grid[row][col - 1].pastNode = node;
+        direction = 'top'
+        return grid[row][col - 1]
+    }
+
+    else if ((row + 1 < rowAmount) && !(grid[row + 1][col].isWall) && !(grid[row + 1][col].visited)) {
+        grid[row + 1][col].visited = true;
+        grid[row + 1][col].lastDirection = 'left';
+        grid[row + 1][col].pastNode = node;
+        direction = 'right'
+        return grid[row + 1][col]
+    }
+
+    else if ((col + 1 < columnAmount) && !(grid[row][col + 1].isWall) && !(grid[row][col + 1].visited)) {
+        grid[row][col + 1].visited = true;
+        grid[row][col + 1].lastDirection = 'top';
+        grid[row][col + 1].pastNode = node;
+        direction = 'down'
+        return grid[row][col + 1]
+    }
+
+    else if ((row > 0) && !(grid[row - 1][col].isWall) && !(grid[row - 1][col].visited)) {
+        grid[row - 1][col].visited = true;
+        grid[row - 1][col].lastDirection = 'right';
+        grid[row - 1][col].pastNode = node;
+        direction = 'left'
+        return grid[row - 1][col]
+    }
 }
