@@ -569,6 +569,7 @@ async function DFS() {
             // Edge case where there is no more edge nodes to explore
             if (k == visitedNodesList.length) {
                 foundEndNode = true
+                algorithmRun = 2;
             }
             nextNode = await DFSEdge(visitedNodesList[visitedNodesList.length - k], direction);
             k++
